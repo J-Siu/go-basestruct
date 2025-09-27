@@ -31,10 +31,11 @@ import (
 
 // A simple struct to be embedded by other struct
 type Base struct {
-	Err         error  `json:"Err"`
-	LogLevel    int    `json:"LogLevel"`
-	Initialized bool   `json:"Initialized"`
-	MyType      string `json:"MyType"` // Store typename. Cheaper way than reflector for logging.
+	Err           error  `json:"Err,omitempty"`
+	LogLevel      int    `json:"LogLevel,omitempty"`
+	Initialized   bool   `json:"Initialized,omitempty"`
+	MyType        string `json:"MyType,omitempty"` // Store typename. Cheaper way than reflector for logging.
+	OnErrContinue bool   `json:"OnErrContinue,omitempty"`
 }
 
 // To be put at the beginning of
@@ -44,18 +45,20 @@ type Base struct {
 //  3. All else, check passed -> return `true`
 func (b *Base) CheckErrInit(prefix string) (pass bool) {
 	pass = true
-	// check error first
-	if b.Err != nil {
-		pass = false
-	} else if !b.Initialized {
-		errMsg := "not initialized"
-		if prefix != "" {
-			errMsg = prefix + ": " + errMsg
-		} else if b.MyType != "" {
-			errMsg = b.MyType + ": " + errMsg
+	if !b.OnErrContinue {
+		// check error first
+		if b.Err != nil {
+			pass = false
+		} else if !b.Initialized {
+			errMsg := "not initialized"
+			if prefix != "" {
+				errMsg = prefix + ": " + errMsg
+			} else if b.MyType != "" {
+				errMsg = b.MyType + ": " + errMsg
+			}
+			b.Err = errors.New(errMsg)
+			pass = false
 		}
-		b.Err = errors.New(errMsg)
-		pass = false
 	}
 	return pass
 }

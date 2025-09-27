@@ -9,29 +9,33 @@ Provides a simple struct with common 4 fields to be embedded by other structs.
 A simple struct to be embedded by other struct
 ```go
 type Base struct {
-        Err         error  `json:"Err"`
-        LogLevel    int    `json:"LogLevel"`
-        Initialized bool   `json:"Initialized"`
-        MyType      string `json:"MyType"` // Store typename. Cheaper way than reflector for logging.
+  Err         error  `json:"Err"`
+  LogLevel    int    `json:"LogLevel"`
+  Initialized bool   `json:"Initialized"`
+  MyType      string `json:"MyType"` // Store typename. Cheaper way than reflector for logging.
+  OnErrContinue bool   `json:"OnErrContinue,omitempty"`
 }
 ```
 
 ### CheckErrInit
 
-To be put at the beginning of Check error and initialization state in following order:
-
-1. If `Err` not nil -> check failed -> return `false`
-2. If `Initialized` is `false` -> check failed -> set `Err` -> then return `false`
-3. All else, check passed -> return `true`
-
 ```go
 func (b *Base) CheckErrInit(prefix string) (pass bool)
 ```
+
+To be put at the beginning of Check error and initialization state in following order:
+
+1. If `OnErrContinue` is `true` -> check passed -> return `true`
+2. If `Err` not nil -> check failed -> return `false`
+3. If `Initialized` is `false` -> check failed -> set `Err` -> return `false`
+4. All else, check passed -> return `true`
 
 ### Change Log
 
 - v1.0.0
   - Initial commit
+- v1.1.0
+  - Add `OnErrContinue`
 
 ### License
 
