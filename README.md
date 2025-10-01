@@ -1,5 +1,7 @@
 # basestruct
 
+> Deprecated: This project is now merged into [go-helper](github.com/J-Siu/go-helper) under basestruct.
+
 Provides a simple struct with common 4 fields to be embedded by other structs.
 
 ## TYPES
